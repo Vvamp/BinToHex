@@ -14,10 +14,10 @@ def generateDiffFile(fileName):
     diff_file.close()
 
 
-target_file = "chauffeur3"
+target_file = "vehicle"
 
 
-#generateDiffFile(target_file)
+generateDiffFile(target_file)
 ddd_data = readFile(target_file)
 identifier0 = ddd_data[0]
 identifier1 = ddd_data[1]
@@ -41,3 +41,12 @@ cardAppr8 = chr(ddd_data[21])
 
 
 print(f"Identifier: {identifier0}{identifier1} \nClockstop: ({clockstopLength}) {clockstop}\nCard Serial: ({cardserialLength}) [{cardserialZero}] {cardserial}\n Month Year: {cardMonth}/{cardYear}\nType: {cardType}\nManufacturer Code: {cardManuCode}\nApproval: {cardAppr1}{cardAppr2}{cardAppr3}{cardAppr4}{cardAppr5}{cardAppr6}{cardAppr7}{cardAppr8}")
+
+def main(args):
+    return
+
+
+
+
+if __name__ == "__main__":
+   main(sys.argv[1:])
