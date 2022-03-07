@@ -1,48 +1,92 @@
+import sys, getopt
+from operator import truediv
+from printers import HexPrinter,BinaryPrinter
+
 def readFile(fileName):
     ddd_file = open(f"{fileName}.DDD", "rb")
     ddd_data = ddd_file.read()
     ddd_file.close()
     return ddd_data
 
-def generateDiffFile(fileName):
-    ddd_file = open(f"{fileName}.DDD", "rb")
-    ddd_data = ddd_file.read()
-    ddd_file.close()
-    diff_file =open(f"{fileName}.txt", "a+")
-    for byte in ddd_data:
-        diff_file.write("{0:#0{1}x}\n".format(byte,4))
-    diff_file.close()
+def generateFile(importFilename : str, printHex: bool, printBinary : bool, exportFilename = ""):
+    if exportFilename == "": 
+        exportFilename = importFilename + ".txt"
+
+    types = [printHex, printBinary]
+    multipleTypes =  types.count(True) > 1
+    
+    importFile = open(f"{importFilename}.DDD", "rb")
+    ddd_data = importFile.read()
+    importFile.close()
+
+    exportFile = open(f"{exportFilename}", "w+")
+    output = []
+    printers = []
+    if printHex:  
+        printers.append(HexPrinter(ddd_data))
+    if printBinary:
+        printers.append(BinaryPrinter(ddd_data))
+    
+    for printer in printers:
+        if multipleTypes and len(output) >= 1:
+            data = printer.process()
+            for i in range(0, len(output)):
+                output[i] += " | " + data[i]
+        else:
+            output = printer.process()
+
+    for line in output:
+        try:
+            exportFile.write(line + "\n")
+        except:
+            print("An error occured while trying to write to the output file.")
+            return
+    try:
+        exportFile.close()
+    except:
+        print("An error occured while trying to write to close the output file.")
+        return
+    finally:
+        print("Successfully wrote to outputfile " + exportFilename)
 
 
-target_file = "vehicle"
 
+def main(argv : list[str]):
+    inputfile = ""
+    outputfile = ""
+    printHex = False
+    printBinary = False
+    helpString = "Usage: main.py -i <inputfile> -o (outputfile) -hex -binary"
 
-generateDiffFile(target_file)
-ddd_data = readFile(target_file)
-identifier0 = ddd_data[0]
-identifier1 = ddd_data[1]
-clockstopLength = ddd_data[2]
-clockstop = ddd_data[3]
-cardserialLength = ddd_data[4]
-cardserialZero = ddd_data[5]
-cardserial = int.from_bytes(ddd_data[6:10], "big")
-cardMonth = hex(ddd_data[10])[2:]
-cardYear = hex(ddd_data[11])[2:]
-cardType = ddd_data[12]
-cardManuCode = hex(ddd_data[13])
-cardAppr1 = chr(ddd_data[14])
-cardAppr2 = chr(ddd_data[15])
-cardAppr3 = chr(ddd_data[16])   
-cardAppr4 = chr(ddd_data[17])
-cardAppr5 = chr(ddd_data[18])
-cardAppr6 = chr(ddd_data[19])
-cardAppr7 = chr(ddd_data[20])
-cardAppr8 = chr(ddd_data[21])
+    try:
+        opts, args = getopt.getopt(argv,"hi:oxb",["ifile=","ofile=", "hex", "binary"])
+    except getopt.GetoptError:
+        print(helpString)
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print(helpString)
+            sys.exit()
+        elif opt in ("-x", "--hex"):
+            printHex = True
+        elif opt in ("-b", "--binary"):
+            printBinary = True
+        elif opt in ("-i", "--ifile"):
+            inputfile = arg
+        elif opt in ("-o", "--ofile"):
+            outputfile = arg
 
+    if inputfile == "":
+        print("Error. Not all required arguments were given.\n" + helpString)
+        return
 
-print(f"Identifier: {identifier0}{identifier1} \nClockstop: ({clockstopLength}) {clockstop}\nCard Serial: ({cardserialLength}) [{cardserialZero}] {cardserial}\n Month Year: {cardMonth}/{cardYear}\nType: {cardType}\nManufacturer Code: {cardManuCode}\nApproval: {cardAppr1}{cardAppr2}{cardAppr3}{cardAppr4}{cardAppr5}{cardAppr6}{cardAppr7}{cardAppr8}")
+    if inputfile.lower().endswith(".ddd") == True:
+        inputfiles = inputfile.split(".")[0:-1] 
+        inputfile = ""
+        for item in inputfiles:
+            inputfile += item
 
-def main(args):
+    generateFile(inputfile, printHex, printBinary, outputfile)
     return
 
 
