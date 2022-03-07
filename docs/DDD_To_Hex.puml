@@ -1,0 +1,31 @@
+/'
+    Name: DDD To Hex Class Diagram
+    Author: Vincent van Setten
+    Copyright: (c) Vincent van Setten
+    Date: March, 2022
+'/
+
+@startuml ddd2hex
+'Markup
+!theme blueprint
+skinparam linetype ortho
+skinparam setdpi 900
+scale 1
+title "DDD To Hex" 
+
+' Classes
+interface DataPrinter{
+    + List<string> process()
+}
+
+class HexPrinter implements DataPrinter{
+    + List<string> process()
+}
+
+class BinaryPrinter implements DataPrinter{
+    + List<string> process()
+}
+
+' Notes 
+
+@enduml
