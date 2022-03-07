@@ -1,9 +1,9 @@
 <!-- Project Badges-->
-<!-- ![Contributors Badge](https://img.shields.io/github/contributors/Vvamp/ImageLoader.svg?)
-![Forks Badge](https://img.shields.io/github/forks/Vvamp/ImageLoader.svg?)
-![Stars Badge](https://img.shields.io/github/stars/Vvamp/ImageLoader.svg?)
-![Issues Badge](https://img.shields.io/github/issues/Vvamp/ImageLoader.svg?)
-![License Badge](https://img.shields.io/github/license/Vvamp/ImageLoader.svg?) -->
+![Contributors Badge](https://img.shields.io/github/contributors/Vvamp/DDDToHex.svg?)
+![Forks Badge](https://img.shields.io/github/forks/Vvamp/DDDToHex.svg?)
+![Stars Badge](https://img.shields.io/github/stars/Vvamp/DDDToHex.svg?)
+![Issues Badge](https://img.shields.io/github/issues/Vvamp/DDDToHex.svg?)
+![License Badge](https://img.shields.io/github/license/Vvamp/DDDToHex.svg?)
 
 # DDD To Hex
 A simple script that converts DDD(tachograph files) into binary, or hex. 
