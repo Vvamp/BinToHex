@@ -47,3 +47,16 @@ class BinaryPrinter(DataPrinter):
         for _data in self.data:
             output.append("{0:08b}".format(_data))
         return output
+
+
+class DecimalPrinter(DataPrinter):
+    def process(self):
+        """Process the DDD data into an array of lines in Decimal format
+
+        Returns:
+            List<str>: Output array of processed data in Decimal format
+        """
+        output=[]
+        for _data in self.data:
+            output.append("{}".format(_data))
+        return output

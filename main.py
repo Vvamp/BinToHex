@@ -1,6 +1,7 @@
+from email import message
 import sys, getopt
 from operator import truediv
-from printers import HexPrinter,BinaryPrinter
+from printers import DecimalPrinter, HexPrinter,BinaryPrinter
 
 Debug = False
 
@@ -16,7 +17,7 @@ def readFile(fileName):
     ddd_file.close()
     return ddd_data
 
-def generateFile(importFilename : str, printHex: bool, printBinary : bool, exportFilename : str):
+def generateFile(importFilename : str, printHex: bool, printBinary : bool, printDecimal : bool, exportFilename : str):
     types = [printHex, printBinary]
     multipleTypes =  types.count(True) > 1
     
@@ -34,6 +35,9 @@ def generateFile(importFilename : str, printHex: bool, printBinary : bool, expor
     if printBinary:
         printDebug("Enabling BinaryPrinter")
         printers.append(BinaryPrinter(ddd_data))
+    if printDecimal:
+        printDebug("Enabling DecimalPrinter")
+        printers.append(DecimalPrinter(ddd_data))
    
     if(len(printers) == 0):
         print("Error: No printers specified!")
@@ -72,10 +76,11 @@ def main(argv : list[str]):
     outputfile = ""
     printHex = False
     printBinary = False
-    helpString = "Usage: main.py  (--hex) (--binary) (--verbose) -i <inputfile> -o <outputfile>"
+    printDecimal = False 
+    helpString = "Usage: main.py  (--hex) (--binary) (--decimal) (--verbose) -i <inputfile> -o <outputfile>"
 
     try:
-        opts, args = getopt.getopt(argv,"hi:o:xbv",["ifile=","ofile=", "hex", "binary", "verbose"])
+        opts, args = getopt.getopt(argv,"hi:o:xbv",["ifile=","ofile=", "hex", "binary", "verbose", "decimal"])
     except getopt.GetoptError:
         print(helpString)
         sys.exit(2)
@@ -87,6 +92,8 @@ def main(argv : list[str]):
             printHex = True
         elif opt in ("-b", "--binary"):
             printBinary = True
+        elif opt in ('-d', "--decimal"):
+            printDecimal = True
         elif opt in ("-i", "--ifile"):
             inputfile = arg
         elif opt in ("-o", "--ofile"):
@@ -102,7 +109,7 @@ def main(argv : list[str]):
         print("Error. Not all required arguments were given.\n" + helpString)
         return
 
-    generateFile(inputfile, printHex, printBinary, outputfile)
+    generateFile(inputfile, printHex, printBinary, printDecimal, outputfile)
     return
 
 
