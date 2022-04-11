@@ -14,16 +14,16 @@ from typing import List
 class DataPrinter:
     """Abstracts a data printer object
     """
-    def __init__(self, ddd_data : bytes):
+    def __init__(self, binary_data : bytes = None):
         """Instantiate a data printer
 
         Args:
-            ddd_data (bytes): DDD data read as bytes
+            binary_data (bytes): binary data read as bytes
         """
-        self.data = ddd_data
+        self.data = binary_data
 
     def process(self):
-        """Process the DDD data into an array of lines in a specified method
+        """Process the binary data into an array of lines in a specified method
 
         Returns:
             List<str>: Output array of processed data
@@ -33,9 +33,17 @@ class DataPrinter:
             output.append(_data)
         return output
 
+    def set_data(self, data : bytes):
+        """Set the internal data
+
+        Args:
+            data (bytes): List of input bytes
+        """
+        self.data = data
+
 class HexPrinter(DataPrinter):
     def process(self):
-        """Process the DDD data into an array of lines in HEX Format
+        """Process the binary data into an array of lines in HEX Format
 
         Returns:
             List<str>: Output array of processed data in hex format
@@ -47,7 +55,7 @@ class HexPrinter(DataPrinter):
 
 class BinaryPrinter(DataPrinter):
     def process(self):
-        """Process the DDD data into an array of lines in Binary format
+        """Process the binary data into an array of lines in Binary format
 
         Returns:
             List<str>: Output array of processed data in binary format
@@ -60,7 +68,7 @@ class BinaryPrinter(DataPrinter):
 
 class DecimalPrinter(DataPrinter):
     def process(self):
-        """Process the DDD data into an array of lines in Decimal format
+        """Process the binary data into an array of lines in Decimal format
 
         Returns:
             List<str>: Output array of processed data in Decimal format
@@ -68,4 +76,21 @@ class DecimalPrinter(DataPrinter):
         output=[]
         for _data in self.data:
             output.append("{}".format(_data))
+        return output
+
+
+class AsciiPrinter(DataPrinter):
+    def process(self):
+        """Process the binary data into an array of lines in ascii text format
+
+        Returns:
+            List<str>: Output array of processed data in ascii text format
+        """
+        output=[]
+        for _data in self.data:
+            try:
+                print(_data.decode("ascii"))
+                output.append("{}".format(_data.decode("ascii")))
+            except:
+                output.append(BinaryPrinter([_data]).process()[0])
         return output

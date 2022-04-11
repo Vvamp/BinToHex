@@ -1651,18 +1651,18 @@ required_result_all = """0x24 | 00100100 | 36
 TEST_FILE = "testbinary.bin"
 
 def test_hex():
-    result = generateFile(TEST_FILE, True, False, False, "__sysout")
+    result = generateFile(TEST_FILE, [HexPrinter()], "__sysout")
     assert(result.strip("\n ") == required_result_hex.strip("\n "))
 
 def test_bin():
-    result = generateFile(TEST_FILE, False, True, False, "__sysout")
+    result = generateFile(TEST_FILE, [BinaryPrinter()], "__sysout")
     assert(result.strip("\n ") == required_result_bin.strip("\n "))
 
 def test_dec():
-    result = generateFile(TEST_FILE, False, False, True, "__sysout")
+    result = generateFile(TEST_FILE, [DecimalPrinter()], "__sysout")
     assert(result.strip("\n ") == required_result_dec.strip("\n "))
 
 def test_multiple():
-    result = generateFile(TEST_FILE, True, True, True, "__sysout")
+    result = generateFile(TEST_FILE, [HexPrinter(),BinaryPrinter(),DecimalPrinter()], "__sysout")
     assert(result.strip("\n ") == required_result_all.strip("\n "))
 

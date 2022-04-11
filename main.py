@@ -8,8 +8,8 @@
     License: LICENSE.md
 '''
 
-import sys, getopt
-from printers import DecimalPrinter, HexPrinter,BinaryPrinter
+import sys, getopt, traceback
+from printers import DecimalPrinter, HexPrinter,BinaryPrinter, AsciiPrinter
 from sysout import sysout
 
 Debug = False
@@ -22,16 +22,29 @@ def printDebug(stringToWrite : str):
 
 def readFile(fileName):
     ddd_file = open(f"{fileName}", "rb")
-    ddd_data = ddd_file.read()
+    binary_data = ddd_file.read()
     ddd_file.close()
-    return ddd_data
+    return binary_data
 
-def generateFile(importFilename : str, printHex: bool, printBinary : bool, printDecimal : bool, exportFilename : str):
-    types = [printHex, printBinary]
-    multipleTypes =  types.count(True) > 1
-    
+def generateFile(importFilename : str, printers : list, exportFilename : str):
+    """Generate a text file from a binary file, using given printers
+
+    Args:
+        importFilename (str): Import filename
+        printers (list): A list of DataPrinters
+        exportFilename (str): Optional output file name, or __sysout
+
+    Returns:
+        <Nothing, String>: Either returns void, or the output if '__sysout' was passed as exportname 
+    """
+    multipleTypes =  len(printers) > 1
+     
+    if(len(printers) == 0):
+        print("Error: No printers specified!")
+        return 
+
     importFile = open(f"{importFilename}", "rb")
-    ddd_data = importFile.read()
+    binary_data = importFile.read()
     importFile.close()
 
     if exportFilename != "__sysout":
@@ -39,45 +52,38 @@ def generateFile(importFilename : str, printHex: bool, printBinary : bool, print
         print("Generating output file {} for {}...".format(exportFilename, importFilename))
     else:
         exportFile = sysout()
+
     output = []
-    printers = []
-    if printHex:  
-        printDebug("Enabling HexPrinter")
-        printers.append(HexPrinter(ddd_data))
-    if printBinary:
-        printDebug("Enabling BinaryPrinter")
-        printers.append(BinaryPrinter(ddd_data))
-    if printDecimal:
-        printDebug("Enabling DecimalPrinter")
-        printers.append(DecimalPrinter(ddd_data))
-   
-    if(len(printers) == 0):
-        print("Error: No printers specified!")
-        return 
+    for printer in printers:
+        printDebug("Enabling " + printer.__class__.__name__ + "...")
+        printer.set_data(binary_data)  
 
     for printer in printers:
         printDebug("Starting write job...")
         if multipleTypes and len(output) >= 1:
-            printDebug("Adding another row of data")
+            printDebug("Adding another column of data")
             data = printer.process()
             for i in range(0, len(output)):
                 output[i] += " | " + data[i]
         else:
-            printDebug("Adding first row of data")
+            printDebug("Adding first column of data")
             output = printer.process()
 
     for line in output:
         try:
             exportFile.write(line + "\n")
-        except:
+        except Exception as exc:
             print("An error occurred while trying to write to the output file.")
+            printDebug("Exception Details: " + traceback.format_exc())
             return
     try:
         rval = exportFile.close()
         if rval:
             return rval 
-    except:
+    except Exception as exc:
         print("An error occurred while trying to write to close the output file.")
+        printDebug("Exception Details: " + traceback.format_exc())
+
         return
     finally:
         print("Successfully wrote to outputfile " + exportFilename + "!")
@@ -88,9 +94,7 @@ def main(argv : list[str]):
     global Debug
     inputfile = ""
     outputfile = ""
-    printHex = False
-    printBinary = False
-    printDecimal = False 
+    printers = []
     helpString = "Usage: main.py (--hex) (--binary) (--decimal) (--verbose) -i <inputfile> -o <outputfile>"
 
     try:
@@ -103,11 +107,13 @@ def main(argv : list[str]):
             print(helpString)
             sys.exit()
         elif opt in ("-x", "--hex"):
-            printHex = True
+            printers.append(HexPrinter())
         elif opt in ("-b", "--binary"):
-            printBinary = True
+            printers.append(BinaryPrinter())
         elif opt in ('-d', "--decimal"):
-            printDecimal = True
+            printers.append(DecimalPrinter())
+        elif opt in ('-a', "--ascii"):
+            printers.append(AsciiPrinter())
         elif opt in ("-i", "--ifile"):
             inputfile = arg
         elif opt in ("-o", "--ofile"):
@@ -123,7 +129,7 @@ def main(argv : list[str]):
         print("Error. Not all required arguments were given.\n" + helpString)
         return
 
-    generateFile(inputfile, printHex, printBinary, printDecimal, outputfile)
+    generateFile(inputfile, printers, outputfile)
     return
 
 
