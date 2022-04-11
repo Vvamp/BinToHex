@@ -4,8 +4,7 @@
 ![Stars Badge](https://img.shields.io/github/stars/Vvamp/BinToHex.svg?)
 ![Issues Badge](https://img.shields.io/github/issues/Vvamp/BinToHex.svg?)
 ![License Badge](https://img.shields.io/github/license/Vvamp/BinToHex.svg?)
-[![Build](https://github.com/Vvamp/BinToHex/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/Vvamp/BinToHex/actions/workflows/python-app.yml)
-
+![Build Badge](https://img.shields.io/github/workflow/status/Vvamp/BinToHex/Python%20application)
 
 # Bin To Hex
 A simple script that converts binary files into readable decimal, binary, or hex files. 
