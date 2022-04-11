@@ -14,13 +14,27 @@ from sysout import sysout
 
 Debug = False
 
-
 def printDebug(stringToWrite : str):
+    """Print if verbose mode is enabled
+
+    Args:
+        stringToWrite (str): The string to potentially write
+    """
+    
     global Debug
     if(Debug):
         print(stringToWrite)
 
+
 def readFile(fileName):
+    """Read a file in binary format and return the bytes
+
+    Args:
+        fileName str: Name of the file to read 
+
+    Returns:
+        List<Byte>: The bytes from the file
+    """
     ddd_file = open(f"{fileName}", "rb")
     binary_data = ddd_file.read()
     ddd_file.close()
@@ -91,6 +105,11 @@ def generateFile(importFilename : str, printers : list, exportFilename : str):
 
 
 def main(argv : list[str]):
+    """Simply sort out the CLI arguments and call the decoder function
+
+    Args:
+        argv (list[str]): Command line arguments
+    """
     global Debug
     inputfile = ""
     outputfile = ""
