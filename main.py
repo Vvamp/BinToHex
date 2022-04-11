@@ -97,6 +97,15 @@ def main(argv : list[str]):
     printers = []
     helpString = "Usage: main.py (--hex) (--binary) (--decimal) (--verbose) -i <inputfile> -o <outputfile>"
 
+    if(len(argv) == 0):
+        inputfile = input(" Input path to your binary file >> ")
+        printers_in = input(" Input the first letter of the printers you want. Example: 'hex binary decimal' >> ")
+        outputfile = input(" File name to write to >> ")
+        args = ["-i", inputfile, "-o", outputfile]
+        for printer_in in printers_in.split(" "):
+            args.append("--" + printer_in)
+        return main(args)
+
     try:
         opts, args = getopt.getopt(argv,"hi:o:xbv",["ifile=","ofile=", "hex", "binary", "verbose", "decimal"])
     except getopt.GetoptError:
@@ -136,4 +145,7 @@ def main(argv : list[str]):
 
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
+   r_val = main(sys.argv[1:])
+   if(r_val):   
+       print(r_val)
+       input("")
