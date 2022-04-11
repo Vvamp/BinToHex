@@ -1,3 +1,6 @@
 *.DDD
 *.txt
 __pycache__*
+.pytest_cache*
+*.bin
+!testbinary.bin

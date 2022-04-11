@@ -11,7 +11,7 @@
 skinparam linetype ortho
 skinparam setdpi 900
 scale 1
-title "DDD To Hex" 
+title "Binary To Hex" 
 
 ' Classes
 interface DataPrinter{
@@ -23,6 +23,10 @@ class HexPrinter implements DataPrinter{
 }
 
 class BinaryPrinter implements DataPrinter{
+    + List<string> process()
+}
+
+class DecimalPrinter implements DataPrinter{
     + List<string> process()
 }
 

@@ -23,8 +23,10 @@ endif
 
 all: plantuml
 
-run: all
+run: test all
 	python main.py -h
 
+test:
+	pytest ./test_decoders.py
 
 clean: clean-plantuml

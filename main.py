@@ -1,7 +1,16 @@
-from email import message
+'''
+    File name: main.py
+    Description: Converts unreadable binary files into readable binary/hex/decimal
+    Author: Vincent van Setten
+    Date created: 23/02/2022
+    Date last modified: 11/04/2022
+    Python Version: 3.10.2
+    License: LICENSE.md
+'''
+
 import sys, getopt
-from operator import truediv
 from printers import DecimalPrinter, HexPrinter,BinaryPrinter
+from sysout import sysout
 
 Debug = False
 
@@ -25,8 +34,11 @@ def generateFile(importFilename : str, printHex: bool, printBinary : bool, print
     ddd_data = importFile.read()
     importFile.close()
 
-    exportFile = open(f"{exportFilename}", "w+")
-    print("Generating output file {} for {}...".format(exportFilename, importFilename))
+    if exportFilename != "__sysout":
+        exportFile = open(f"{exportFilename}", "w+")
+        print("Generating output file {} for {}...".format(exportFilename, importFilename))
+    else:
+        exportFile = sysout()
     output = []
     printers = []
     if printHex:  
@@ -58,12 +70,14 @@ def generateFile(importFilename : str, printHex: bool, printBinary : bool, print
         try:
             exportFile.write(line + "\n")
         except:
-            print("An error occured while trying to write to the output file.")
+            print("An error occurred while trying to write to the output file.")
             return
     try:
-        exportFile.close()
+        rval = exportFile.close()
+        if rval:
+            return rval 
     except:
-        print("An error occured while trying to write to close the output file.")
+        print("An error occurred while trying to write to close the output file.")
         return
     finally:
         print("Successfully wrote to outputfile " + exportFilename + "!")
@@ -77,7 +91,7 @@ def main(argv : list[str]):
     printHex = False
     printBinary = False
     printDecimal = False 
-    helpString = "Usage: main.py  (--hex) (--binary) (--decimal) (--verbose) -i <inputfile> -o <outputfile>"
+    helpString = "Usage: main.py (--hex) (--binary) (--decimal) (--verbose) -i <inputfile> -o <outputfile>"
 
     try:
         opts, args = getopt.getopt(argv,"hi:o:xbv",["ifile=","ofile=", "hex", "binary", "verbose", "decimal"])

@@ -1,3 +1,12 @@
+'''
+    File name: printers.py
+    Description: Declare different methods to print bytes
+    Author: Vincent van Setten
+    Date created: 23/02/2022
+    Date last modified: 11/04/2022
+    Python Version: 3.10.2
+    License: LICENSE.md
+'''
 
 from typing import List
 
