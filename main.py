@@ -10,6 +10,7 @@
 
 import sys, getopt, traceback
 from printers import DecimalPrinter, HexPrinter,BinaryPrinter, AsciiPrinter
+from readers import HexReader
 from sysout import sysout
 
 Debug = False
@@ -40,6 +41,57 @@ def readFile(fileName):
     ddd_file.close()
     return binary_data
 
+def generateFileReverse(importFilename : str, reader : str, exportFilename : str):
+    """Generate a binary file from a text-encoded binary file file, using given reader
+
+    Args:
+        importFilename (str): Import filename
+        reader: A DataReader
+        exportFilename (str): Optional output file name, or __sysout
+
+    Returns:
+        <Nothing, String>: Either returns void, or the output if '__sysout' was passed as exportname 
+    """
+
+    # Read text file
+    importFile = open(f"{importFilename}", "r")
+    text_data = importFile.read()
+    importFile.close()
+
+    # Set output
+    if exportFilename != "__sysout":
+        exportFile = open(f"{exportFilename}", "wb+")
+        print("Generating output file {} for data {}...".format(exportFilename, importFilename))
+    else:
+        exportFile = sysout()
+
+    # Generate new data
+    printer = HexReader(1, text_data)
+    output = printer.process()
+
+    # Write the data
+    for line in output:
+        try:
+            exportFile.write(line)
+        except Exception as exc:
+            print("An error occurred while trying to write to the output file.")
+            printDebug("Exception Details: " + traceback.format_exc())
+            return
+    
+    # Close files
+    try:
+        rval = exportFile.close()
+        if rval:
+            return rval 
+    except Exception as exc:
+        print("An error occurred while trying to write to close the output file.")
+        printDebug("Exception Details: " + traceback.format_exc())
+
+        return
+    finally:
+        print("Successfully wrote data to outputfile " + exportFilename + "!")
+
+
 def generateFile(importFilename : str, printers : list, exportFilename : str):
     """Generate a text file from a binary file, using given printers
 
@@ -57,21 +109,25 @@ def generateFile(importFilename : str, printers : list, exportFilename : str):
         print("Error: No printers specified!")
         return 
 
+    # Read binary data
     importFile = open(f"{importFilename}", "rb")
     binary_data = importFile.read()
     importFile.close()
 
+    # Set output
     if exportFilename != "__sysout":
         exportFile = open(f"{exportFilename}", "w+")
         print("Generating output file {} for {}...".format(exportFilename, importFilename))
     else:
         exportFile = sysout()
 
+    # Preparing data
     output = []
     for printer in printers:
         printDebug("Enabling " + printer.__class__.__name__ + "...")
         printer.set_data(binary_data)  
 
+    # Processing data
     for printer in printers:
         printDebug("Starting write job...")
         if multipleTypes and len(output) >= 1:
@@ -83,6 +139,7 @@ def generateFile(importFilename : str, printers : list, exportFilename : str):
             printDebug("Adding first column of data")
             output = printer.process()
 
+    # Write data
     for line in output:
         try:
             exportFile.write(line + "\n")
@@ -90,6 +147,8 @@ def generateFile(importFilename : str, printers : list, exportFilename : str):
             print("An error occurred while trying to write to the output file.")
             printDebug("Exception Details: " + traceback.format_exc())
             return
+
+    # Close files
     try:
         rval = exportFile.close()
         if rval:
@@ -114,7 +173,8 @@ def main(argv : list[str]):
     inputfile = ""
     outputfile = ""
     printers = []
-    helpString = "Usage: main.py (--hex) (--binary) (--decimal) (--verbose) -i <inputfile> -o <outputfile>"
+    helpString = "Usage: main.py (--hex) (--binary) (--decimal) (--verbose) (--reverse) -i <inputfile> -o <outputfile>"
+    reverse = False
 
     if(len(argv) == 0):
         inputfile = input(" Input path to your binary file >> ")
@@ -126,7 +186,7 @@ def main(argv : list[str]):
         return main(args)
 
     try:
-        opts, args = getopt.getopt(argv,"hi:o:xbv",["ifile=","ofile=", "hex", "binary", "verbose", "decimal"])
+        opts, args = getopt.getopt(argv,"hi:o:xbvr",["ifile=","ofile=", "hex", "binary", "verbose", "decimal", "reverse"])
     except getopt.GetoptError:
         print(helpString)
         sys.exit(2)
@@ -148,6 +208,8 @@ def main(argv : list[str]):
             outputfile = arg
         elif opt in ("-v", "--verbose"):
             Debug = True
+        elif opt in ("-r", "--reverse"):
+            reverse=True
         else:
             print("Unknown command line argument {}".format(opt))
             return
@@ -156,8 +218,10 @@ def main(argv : list[str]):
     if inputfile == "":
         print("Error. Not all required arguments were given.\n" + helpString)
         return
-
-    generateFile(inputfile, printers, outputfile)
+    if reverse is False:
+        generateFile(inputfile, printers, outputfile)
+    else:
+        generateFileReverse(inputfile, printers[0], outputfile)
     return
 
 
